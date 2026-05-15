@@ -63,3 +63,22 @@ class AptixarClient:
             raise RuntimeError(f"requestUpload GraphQL error: {messages}")
 
         return body["data"]["requestUpload"]
+
+    def _put_to_sas(self, sas_url: str, file_path: str) -> None:
+        """PUT file bytes to the Azure Blob SAS URL.
+
+        The SAS URL carries its own credential; we MUST NOT add our Bearer header.
+        Azure requires `x-ms-blob-type: BlockBlob` on PUT.
+        """
+        with open(file_path, "rb") as f:
+            response = requests.put(
+                sas_url,
+                data=f,
+                headers={"x-ms-blob-type": "BlockBlob"},
+                timeout=600,
+            )
+
+        if response.status_code not in (200, 201):
+            raise RuntimeError(
+                f"SAS upload HTTP {response.status_code}: {response.text[:200]}"
+            )
