@@ -109,3 +109,24 @@ class AptixarClient:
             asset_id=str(payload["assetId"]),
             job_id=str(payload["jobId"]),
         )
+
+    @classmethod
+    def from_env(cls) -> "AptixarClient":
+        """Construct from APTIXAR_BASE_URL and APTIXAR_TOKEN env vars.
+
+        Loads .env in the current working directory via python-dotenv if present.
+        Defaults APTIXAR_BASE_URL to https://dev.aptixar.com.
+        Raises RuntimeError if APTIXAR_TOKEN is unset.
+        """
+        import os
+
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        base_url = os.environ.get("APTIXAR_BASE_URL", "https://dev.aptixar.com")
+        token = os.environ.get("APTIXAR_TOKEN")
+        if not token:
+            raise RuntimeError(
+                "APTIXAR_TOKEN is not set. Copy .env.template to .env and fill it in."
+            )
+        return cls(base_url=base_url, token=token)
