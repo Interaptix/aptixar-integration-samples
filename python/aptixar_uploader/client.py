@@ -82,3 +82,30 @@ class AptixarClient:
             raise RuntimeError(
                 f"SAS upload HTTP {response.status_code}: {response.text[:200]}"
             )
+
+    def upload_file(
+        self,
+        file_path: str,
+        name: Optional[str] = None,
+        parent_folder_id: Optional[str] = None,
+    ) -> UploadResult:
+        """Upload a file end-to-end. Returns asset_id and job_id."""
+        import os
+
+        ext = os.path.splitext(file_path)[1].lstrip(".")
+        if not ext:
+            raise ValueError(
+                f"Cannot derive fileExt from path with no extension: {file_path}"
+            )
+
+        payload = self._request_upload(
+            file_ext=ext,
+            name=name,
+            parent_folder_id=parent_folder_id,
+        )
+        self._put_to_sas(sas_url=payload["sasUrl"], file_path=file_path)
+
+        return UploadResult(
+            asset_id=str(payload["assetId"]),
+            job_id=str(payload["jobId"]),
+        )
