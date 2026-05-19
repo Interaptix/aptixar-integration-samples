@@ -110,14 +110,14 @@ class AptixarClient:
             job_id=str(payload["jobId"]),
         )
 
-    _DEFAULT_DEV_BASE_URL = "https://content-server-44hat4gnhrijq-guhud8hkbed8babv.z01.azurefd.net"
+    _DEFAULT_BASE_URL = "https://api.aptixar.com"
 
     @classmethod
     def from_env(cls) -> "AptixarClient":
         """Construct from APTIXAR_BASE_URL and APTIXAR_TOKEN env vars.
 
         Loads .env in the current working directory via python-dotenv if present.
-        Defaults APTIXAR_BASE_URL to the dev content server.
+        Defaults APTIXAR_BASE_URL to the prod Aptixar integration API.
         Raises RuntimeError if APTIXAR_TOKEN is unset.
         """
         import os
@@ -125,7 +125,7 @@ class AptixarClient:
         from dotenv import load_dotenv
 
         load_dotenv()
-        base_url = os.environ.get("APTIXAR_BASE_URL", cls._DEFAULT_DEV_BASE_URL)
+        base_url = os.environ.get("APTIXAR_BASE_URL", cls._DEFAULT_BASE_URL)
         token = os.environ.get("APTIXAR_TOKEN")
         if not token:
             raise RuntimeError(
