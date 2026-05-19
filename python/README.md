@@ -49,7 +49,7 @@ result = client.upload_file("/path/to/scene.sog", name="Building 4")
 print(result.asset_id, result.job_id)
 ```
 
-`AptixarClient.from_env()` reads `APTIXAR_BASE_URL` (defaulting to `https://dev.aptixar.com`) and `APTIXAR_TOKEN` from the environment, loading `.env` in the current working directory if present.
+`AptixarClient.from_env()` reads `APTIXAR_BASE_URL` (defaulting to `https://api.aptixar.com`) and `APTIXAR_TOKEN` from the environment, loading `.env` in the current working directory if present.
 
 ## Run the examples
 

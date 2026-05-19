@@ -30,16 +30,11 @@ Two HTTP calls:
 
 Full protocol with curl examples: [`docs/upload-flow.md`](docs/upload-flow.md).
 
-## Dev vs prod
+## API endpoint
 
-The API target is the **Aptixar content server**, not the web portal. Edit `APTIXAR_BASE_URL` in your `.env`:
+The integration API lives at **`https://api.aptixar.com`** — already set as the default `APTIXAR_BASE_URL` in `.env.template`. You shouldn't need to change it.
 
-- **Dev** — `https://content-server-44hat4gnhrijq-guhud8hkbed8babv.z01.azurefd.net`
-- **Prod** — `https://content-server-lfwhrpnmnovn2-atbxb5b5bubne4f6.z01.azurefd.net`
-
-The companion web portals (where an admin signs in to mint tokens) live at `https://dev.aptixar.com` (dev) and `https://aptixar.com` (prod). You don't call those URLs from the integration — you visit them in a browser to manage tokens.
-
-Tokens are environment-specific. A dev token will not work against prod.
+The companion web portal (where an admin signs in to mint tokens) is at `https://aptixar.com`. You don't call that URL from the integration — you visit it in a browser to manage tokens.
 
 ## Repository layout
 
