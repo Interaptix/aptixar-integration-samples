@@ -6,7 +6,7 @@ The token is missing, malformed, or the server doesn't recognize it.
 
 - Verify the header is exactly `Authorization: Bearer aptx_int_<...>` (note the space after `Bearer`).
 - Verify the token starts with `aptx_int_` and has 32 characters after the prefix.
-- Make sure you're hitting the right environment — a dev token will not work on prod, and vice versa.
+- Tokens are tenant-scoped. Verify the token was minted in the same Aptixar tenant whose data you expect the upload to land in.
 
 ## HTTP 403 on `requestUpload`
 
@@ -34,10 +34,3 @@ The Aptixar IMPORT processor may have rejected the file (corrupt, unsupported va
 
 - Find the asset by `assetId` in the portal — there may be a processing-error state visible there.
 - File an issue with the `jobId` and `assetId` from the `requestUpload` response.
-
-## `.env` not being read by the Python sample
-
-`python-dotenv` only reads `.env` from the **current working directory** (or you can pass an explicit path).
-
-- Run `python -m aptixar_uploader upload ...` from the same directory as your `.env`, OR
-- Export the env vars directly: `APTIXAR_TOKEN=aptx_int_... python -m aptixar_uploader upload ...`.

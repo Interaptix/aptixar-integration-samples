@@ -10,7 +10,7 @@ Uploading a file to Aptixar takes three steps:
 2. **Partner calls `requestUpload`** — a GraphQL mutation that returns a temporary Azure Blob SAS URL.
 3. **Partner `PUT`s the file** to that SAS URL.
 
-The server's IMPORT processor takes over once the PUT completes and turns the upload into an asset/snapshot.
+The server creates the asset record during Step 1 (you get back its `assetId` immediately). Once the PUT completes in Step 2, the server's IMPORT processor takes over and attaches a snapshot — previews, mesh files, etc. — to that asset.
 
 ---
 
