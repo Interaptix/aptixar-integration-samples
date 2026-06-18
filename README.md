@@ -1,5 +1,7 @@
 # Aptixar Integration Samples
 
+[![Integration status](https://github.com/Interaptix/aptixar-integration-samples/actions/workflows/integration-status.yml/badge.svg)](https://github.com/Interaptix/aptixar-integration-samples/actions/workflows/integration-status.yml)
+
 Sample code and documentation showing how to push files into Aptixar from a third-party integration.
 
 The protocol is documented language-agnostically in [`docs/`](docs/). A working Python reference lives in [`python/`](python/). If you're building in another language, read the docs and port the protocol — it's intentionally small (two HTTP calls).
