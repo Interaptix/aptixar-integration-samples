@@ -47,9 +47,12 @@ from aptixar_uploader import AptixarClient
 client = AptixarClient.from_env()
 result = client.upload_file("/path/to/scene.sog", name="Building 4")
 print(result.asset_id, result.job_id)
+print(result.view_url)  # https://www.aptixar.com/assets?assetId=...
 ```
 
-`AptixarClient.from_env()` reads `APTIXAR_BASE_URL` (defaulting to `https://api.aptixar.com`) and `APTIXAR_TOKEN` from the environment, loading `.env` in the current working directory if present.
+`result.view_url` opens the scene in the web portal. It is valid as soon as the upload is requested — you don't have to wait for processing to finish. `client.view_url(asset_id)` builds the same link from an id you already have. See [`../docs/upload-flow.md`](../docs/upload-flow.md#the-view-link) for what it shows at each stage, and who can open it.
+
+`AptixarClient.from_env()` reads `APTIXAR_BASE_URL` (defaulting to `https://api.aptixar.com`), `APTIXAR_PORTAL_URL` (defaulting to `https://www.aptixar.com`) and `APTIXAR_TOKEN` from the environment, loading `.env` in the current working directory if present.
 
 ## Run the examples
 

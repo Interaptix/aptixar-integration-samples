@@ -20,6 +20,7 @@ The protocol is documented language-agnostically in [`docs/`](docs/). A working 
    pip install -e .
    python -m aptixar_uploader upload /path/to/scene.sog
    ```
+   It prints the `assetId`, the `jobId`, and a `viewUrl` that opens the scene in the portal.
 
 ## The upload flow
 
@@ -30,11 +31,23 @@ Two HTTP calls:
 
 Full protocol with curl examples: [`docs/upload-flow.md`](docs/upload-flow.md).
 
+## The view link
+
+`requestUpload` returns an `assetId`. That's all you need to build a link that opens the scene in the web portal:
+
+```
+https://www.aptixar.com/assets?assetId=<assetId>
+```
+
+The link is buildable and publishable straight away — it keys off the asset rather than the processed scene, so there's nothing to wait for and no id to poll for. Opened before processing finishes, it reports progress and switches itself to the scene once one exists.
+
+The Python client returns it for you as `result.view_url`. Details and caveats: [`docs/upload-flow.md`](docs/upload-flow.md#the-view-link).
+
 ## API endpoint
 
 The integration API lives at **`https://api.aptixar.com`** — already set as the default `APTIXAR_BASE_URL` in `.env.template`. You shouldn't need to change it.
 
-The companion web portal (where an admin signs in to mint tokens) is at `https://aptixar.com`. You don't call that URL from the integration — you visit it in a browser to manage tokens.
+The companion web portal is at **`https://www.aptixar.com`**. You don't call that URL from the integration — it's where an admin signs in to mint tokens, and where [view links](#the-view-link) point.
 
 ## Repository layout
 

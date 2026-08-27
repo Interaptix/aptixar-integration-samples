@@ -46,4 +46,5 @@ def main() -> None:
 
         print(f"assetId: {result.asset_id}")
         print(f"jobId:   {result.job_id}")
-        print("Uploaded -- check the web portal for processing status.")
+        print(f"viewUrl: {result.view_url}")
+        print("Uploaded. The link above works now; it reports progress until processing finishes.")

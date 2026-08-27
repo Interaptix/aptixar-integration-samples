@@ -40,7 +40,8 @@ def main() -> None:
     print(f"  file: {file_path}")
     print(f"  assetId: {result.asset_id}")
     print(f"  jobId:   {result.job_id}")
-    print("  Open the Aptixar web portal to watch the IMPORT processor finish.")
+    print(f"  view:    {result.view_url}")
+    print("  The view link is publishable now -- it reports progress until the IMPORT processor finishes.")
 
 
 if __name__ == "__main__":

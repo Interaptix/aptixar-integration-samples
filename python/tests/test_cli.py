@@ -16,7 +16,11 @@ def test_cli_upload_prints_asset_and_job_ids(monkeypatch, capsys, tmp_path):
     file_path = tmp_path / "x.sog"
     file_path.write_bytes(b"x")
 
-    fake_result = UploadResult(asset_id="asset-1", job_id="job-1")
+    fake_result = UploadResult(
+        asset_id="asset-1",
+        job_id="job-1",
+        view_url="https://www.aptixar.com/assets?assetId=asset-1",
+    )
 
     with patch("aptixar_uploader.cli.AptixarClient") as MockClient:
         MockClient.from_env.return_value.upload_file.return_value = fake_result
@@ -26,6 +30,7 @@ def test_cli_upload_prints_asset_and_job_ids(monkeypatch, capsys, tmp_path):
     captured = capsys.readouterr()
     assert "asset-1" in captured.out
     assert "job-1" in captured.out
+    assert "https://www.aptixar.com/assets?assetId=asset-1" in captured.out
 
 
 def test_cli_upload_passes_name_and_folder(monkeypatch, tmp_path):
@@ -35,7 +40,7 @@ def test_cli_upload_passes_name_and_folder(monkeypatch, tmp_path):
     file_path = tmp_path / "x.sog"
     file_path.write_bytes(b"x")
 
-    fake_result = UploadResult(asset_id="a", job_id="j")
+    fake_result = UploadResult(asset_id="a", job_id="j", view_url="https://www.aptixar.com/assets?assetId=a")
 
     with patch("aptixar_uploader.cli.AptixarClient") as MockClient:
         instance = MockClient.from_env.return_value

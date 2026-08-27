@@ -3,4 +3,4 @@
 from aptixar_uploader.client import AptixarClient, UploadResult
 
 __all__ = ["AptixarClient", "UploadResult"]
-__version__ = "0.1.0"
+__version__ = "0.2.0"

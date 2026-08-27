@@ -21,6 +21,7 @@ def main() -> None:
     result = client.upload_file(sys.argv[1])
 
     print(f"Uploaded. assetId={result.asset_id} jobId={result.job_id}")
+    print(f"View: {result.view_url}")
 
 
 if __name__ == "__main__":

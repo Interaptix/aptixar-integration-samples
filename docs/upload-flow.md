@@ -10,7 +10,9 @@ Uploading a file to Aptixar takes three steps:
 2. **Partner calls `requestUpload`** — a GraphQL mutation that returns a temporary Azure Blob SAS URL.
 3. **Partner `PUT`s the file** to that SAS URL.
 
-The server creates the asset record during Step 1 (you get back its `assetId` immediately). Once the PUT completes in Step 2, the server's IMPORT processor takes over and attaches a snapshot — previews, mesh files, etc. — to that asset.
+The server creates the asset record when you call `requestUpload` (you get back its `assetId` immediately). Once the PUT completes, the server's IMPORT processor takes over and attaches a snapshot — previews, mesh files, etc. — to that asset.
+
+The `assetId` is also all you need to build a [view link](#the-view-link) for the scene, so a link can be published before the file has even been uploaded.
 
 ---
 
@@ -61,7 +63,8 @@ Variables:
 
 - `sasUrl` is the URL you `PUT` the bytes to in Step 2. **Valid for 2 hours.**
 - `expectedBlobUrl` is the same URL without the SAS query string — useful for logging.
-- `assetId` and `jobId` are UUIDs you can use to track processing.
+- `assetId` is the id of the asset the upload lands in. It is what a [view link](#the-view-link) is built from, and what you quote when reporting a problem.
+- `jobId` identifies this particular upload of it.
 
 **curl example:**
 
@@ -103,7 +106,33 @@ Successful response: HTTP 201 (with empty body).
 
 Once the `PUT` succeeds, Aptixar's IMPORT processor (selected automatically based on `fileExt`) picks up the upload, converts it as needed, and attaches the result to the asset created in Step 1. The partner sees the asset appear in the web portal under the chosen folder (or tenant root) once processing completes.
 
-There is currently no integration-API endpoint to poll job status; check the web portal, or watch for the asset to appear with its preview rendered.
+There is currently no integration-API endpoint to poll job status. Open the [view link](#the-view-link) instead — it reports whether the upload is still processing, and shows the scene once it isn't.
+
+---
+
+## The view link
+
+`requestUpload` hands back an `assetId`. That is all you need to build a link that opens the scene in the Aptixar web portal:
+
+```
+https://www.aptixar.com/assets?assetId=<assetId>
+```
+
+Build and publish it **as soon as `requestUpload` returns** — before the `PUT`, and without waiting for processing. It keys off the asset rather than the processed scene, so there is no second id to wait for and nothing to poll.
+
+What the link does depends on where the upload has got to:
+
+| State | What the visitor sees |
+|---|---|
+| Processing finished | The asset's newest scene, same as clicking it in the portal. |
+| Still processing | A progress message. The page switches itself to the scene when processing completes — no refresh needed. |
+| Upload failed | A message saying so, with the reason when the server recorded one. |
+| Nothing uploaded yet | A message saying so — distinct from the failure case. |
+
+Two caveats worth knowing before you publish links:
+
+- **It is not an anonymous share link.** It opens for anyone signed in to your Aptixar organization with permission to view scenes; anyone else is asked to sign in.
+- **`assetId` must be an asset id.** A snapshot id will not resolve here — to link a specific scene rather than the newest one, use `?id=<snapshotId>`. Both ids are shown in a scene's details dialog in the portal.
 
 ---
 
@@ -121,13 +150,14 @@ RESP=$(curl -s -X POST "$APTIXAR_BASE_URL/integrationgraphql/" \
     "variables": {"fileExt": "sog"}
   }')
 
-# Extract sasUrl with jq (or your preferred JSON tool)
+# Extract sasUrl and assetId with jq (or your preferred JSON tool)
 SAS_URL=$(echo "$RESP" | jq -r '.data.requestUpload.sasUrl')
+ASSET_ID=$(echo "$RESP" | jq -r '.data.requestUpload.assetId')
 
 # Step 2: PUT the file
 curl -s -X PUT "$SAS_URL" \
   -H "x-ms-blob-type: BlockBlob" \
   --data-binary @/path/to/scene.sog
 
-echo "Upload complete. Check the web portal."
+echo "Upload complete. View: https://www.aptixar.com/assets?assetId=$ASSET_ID"
 ```

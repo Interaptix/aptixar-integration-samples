@@ -37,6 +37,7 @@ def test_upload_file_runs_both_steps_and_returns_ids(client, tmp_path):
     assert isinstance(result, UploadResult)
     assert result.asset_id == "asset-42"
     assert result.job_id == "job-42"
+    assert result.view_url == "https://www.aptixar.com/assets?assetId=asset-42"
     assert len(responses.calls) == 2
 
 
