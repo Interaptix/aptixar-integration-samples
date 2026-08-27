@@ -28,6 +28,7 @@ def main() -> None:
     print(f"Uploaded to folder {folder_id}.")
     print(f"  assetId={result.asset_id}")
     print(f"  jobId={result.job_id}")
+    print(f"  view={result.view_url}")
 
 
 if __name__ == "__main__":

@@ -16,6 +16,9 @@ mutation RequestUpload($fileExt: String!, $name: String, $parentFolderId: ID) {
 class UploadResult:
     asset_id: str
     job_id: str
+    #: Web portal link that opens the uploaded scene. Valid immediately -- see
+    #: `AptixarClient.view_url`.
+    view_url: str
 
 
 class AptixarClient:
@@ -26,9 +29,25 @@ class AptixarClient:
       2. PUT file bytes to the SAS URL (Azure Blob).
     """
 
-    def __init__(self, base_url: str, token: str):
+    #: Integration API. Where `requestUpload` is POSTed.
+    _DEFAULT_BASE_URL = "https://api.aptixar.com"
+    #: Web portal. A different host from the API -- view links are built here.
+    _DEFAULT_PORTAL_URL = "https://www.aptixar.com"
+
+    def __init__(self, base_url: str, token: str, portal_url: Optional[str] = None):
         self.base_url = base_url.rstrip("/")
         self.token = token
+        self.portal_url = (portal_url or self._DEFAULT_PORTAL_URL).rstrip("/")
+
+    def view_url(self, asset_id: str) -> str:
+        """Web portal link that opens the scene for `asset_id`.
+
+        Buildable the moment `requestUpload` returns: it keys off the asset, not
+        the processed scene, so there is nothing to wait for and nothing to poll.
+        Opened before processing finishes, the page reports progress and switches
+        itself to the scene once one exists.
+        """
+        return f"{self.portal_url}/assets?assetId={asset_id}"
 
     def _request_upload(
         self,
@@ -89,7 +108,7 @@ class AptixarClient:
         name: Optional[str] = None,
         parent_folder_id: Optional[str] = None,
     ) -> UploadResult:
-        """Upload a file end-to-end. Returns asset_id and job_id."""
+        """Upload a file end-to-end. Returns the ids and a portal view link."""
         import os
 
         ext = os.path.splitext(file_path)[1].lstrip(".")
@@ -105,19 +124,20 @@ class AptixarClient:
         )
         self._put_to_sas(sas_url=payload["sasUrl"], file_path=file_path)
 
+        asset_id = str(payload["assetId"])
         return UploadResult(
-            asset_id=str(payload["assetId"]),
+            asset_id=asset_id,
             job_id=str(payload["jobId"]),
+            view_url=self.view_url(asset_id),
         )
-
-    _DEFAULT_BASE_URL = "https://api.aptixar.com"
 
     @classmethod
     def from_env(cls) -> "AptixarClient":
-        """Construct from APTIXAR_BASE_URL and APTIXAR_TOKEN env vars.
+        """Construct from APTIXAR_BASE_URL, APTIXAR_PORTAL_URL and APTIXAR_TOKEN env vars.
 
         Loads .env in the current working directory via python-dotenv if present.
-        Defaults APTIXAR_BASE_URL to the prod Aptixar integration API.
+        Defaults APTIXAR_BASE_URL to the prod Aptixar integration API and
+        APTIXAR_PORTAL_URL to the prod web portal.
         Raises RuntimeError if APTIXAR_TOKEN is unset.
         """
         import os
@@ -126,9 +146,10 @@ class AptixarClient:
 
         load_dotenv()
         base_url = os.environ.get("APTIXAR_BASE_URL", cls._DEFAULT_BASE_URL)
+        portal_url = os.environ.get("APTIXAR_PORTAL_URL", cls._DEFAULT_PORTAL_URL)
         token = os.environ.get("APTIXAR_TOKEN")
         if not token:
             raise RuntimeError(
                 "APTIXAR_TOKEN is not set. Copy .env.template to .env and fill it in."
             )
-        return cls(base_url=base_url, token=token)
+        return cls(base_url=base_url, token=token, portal_url=portal_url)

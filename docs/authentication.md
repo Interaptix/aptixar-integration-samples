@@ -8,7 +8,7 @@ The token is minted by an **Aptixar tenant admin**, not by the partner. The admi
 
 ## Minting a token
 
-1. Sign in to the Aptixar web portal at `https://aptixar.com`.
+1. Sign in to the Aptixar web portal at `https://www.aptixar.com`.
 2. Open **Settings → Integrations**.
 3. Click **New Integration**.
 4. Fill in:
