@@ -41,7 +41,7 @@ def main() -> None:
     print(f"  assetId: {result.asset_id}")
     print(f"  jobId:   {result.job_id}")
     print(f"  view:    {result.view_url}")
-    print("  The view link is publishable now -- it reports progress until the IMPORT processor finishes.")
+    print("  Publish the view link straight away -- it shows progress until the IMPORT processor finishes.")
 
 
 if __name__ == "__main__":
