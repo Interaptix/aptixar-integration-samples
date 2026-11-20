@@ -5,6 +5,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 
 from aptixar_uploader.client import AptixarClient
@@ -34,11 +35,12 @@ def main() -> None:
 
     if args.command == "upload":
         try:
-            client = AptixarClient.from_env()
+            client = AptixarClient.from_env()  # also loads .env, so read the folder after it
+            folder = args.parent_folder_id or os.environ.get("APTIXAR_PARENT_FOLDER_ID") or None
             result = client.upload_file(
                 args.file,
                 name=args.name,
-                parent_folder_id=args.parent_folder_id,
+                parent_folder_id=folder,
             )
         except (RuntimeError, FileNotFoundError, ValueError) as e:
             print(f"error: {e}", file=sys.stderr)

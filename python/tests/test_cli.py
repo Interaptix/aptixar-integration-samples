@@ -76,3 +76,36 @@ def test_cli_upload_exits_nonzero_on_runtime_error(monkeypatch, capsys, tmp_path
         assert exc_info.value.code == 1
         err = capsys.readouterr().err
         assert "nope" in err
+
+
+def _run_upload_and_get_folder(monkeypatch, tmp_path, extra_args):
+    monkeypatch.setenv("APTIXAR_BASE_URL", "https://dev.aptixar.com")
+    monkeypatch.setenv("APTIXAR_TOKEN", "aptx_int_test")
+    file_path = tmp_path / "x.sog"
+    file_path.write_bytes(b"x")
+
+    with patch("aptixar_uploader.cli.AptixarClient") as MockClient:
+        instance = MockClient.from_env.return_value
+        instance.upload_file.return_value = UploadResult(asset_id="a", job_id="j", view_url="v")
+        monkeypatch.setattr(sys, "argv", ["aptixar-upload", "upload", str(file_path), *extra_args])
+        main()
+        return instance.upload_file.call_args.kwargs["parent_folder_id"]
+
+
+def test_cli_upload_folder_defaults_to_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("APTIXAR_PARENT_FOLDER_ID", "folder-from-env")
+    assert _run_upload_and_get_folder(monkeypatch, tmp_path, []) == "folder-from-env"
+
+
+def test_cli_upload_folder_flag_overrides_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("APTIXAR_PARENT_FOLDER_ID", "folder-from-env")
+    assert _run_upload_and_get_folder(monkeypatch, tmp_path, ["--folder", "folder-9"]) == "folder-9"
+
+
+@pytest.mark.parametrize("env_value", [None, ""])
+def test_cli_upload_without_folder_goes_to_root(monkeypatch, tmp_path, env_value):
+    if env_value is None:
+        monkeypatch.delenv("APTIXAR_PARENT_FOLDER_ID", raising=False)
+    else:
+        monkeypatch.setenv("APTIXAR_PARENT_FOLDER_ID", env_value)
+    assert _run_upload_and_get_folder(monkeypatch, tmp_path, []) is None

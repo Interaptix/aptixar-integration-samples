@@ -43,7 +43,7 @@ The `assetId` is also all you need to build a [view link](#the-view-link) for th
 Variables:
 
 - `fileExt` (required) — file extension without leading dot. See [file-types.md](file-types.md).
-- `name` (optional) — display name for the asset. Up to 64 characters; `< > " \ / | ? *` are replaced with `-`. If `null`, the asset is named `Untitled Import <timestamp>`. See [asset-names.md](asset-names.md).
+- `name` (optional) — display name for the asset. Up to 64 characters; `< > " \ / | ? *` are replaced with `-`. A name already used in the same folder gets `(1)`, `(2)`… appended. If `null`, the asset is named `Untitled Import <timestamp>`. See [asset-names.md](asset-names.md).
 - `parentFolderId` (optional) — UUID of a folder in the tenant. If `null`, the asset lands at tenant root.
 
 **Response shape (HTTP 200):**

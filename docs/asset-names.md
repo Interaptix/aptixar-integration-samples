@@ -26,6 +26,16 @@ Some emoji are made of several code points (flags, skin tones, combined emoji su
 
 A longer name makes `requestUpload` return a GraphQL error, and nothing is created. Don't rely on the error text: it can be the specific `Ensure this value has at most 64 characters (it has 65).` or a generic `Internal server error.`. Check the length before you call. The Python client checks it for you: `upload_file` raises `ValueError` before sending anything.
 
+## Names already in use
+
+If the target folder already holds an asset with the same name, the new asset gets a number appended, with no space: `Plant A`, then `Plant A(1)`, `Plant A(2)`, and so on. The upload still succeeds, and the earlier asset is left as it is.
+
+The comparison ignores case and accents, so `Café A`, `cafe a` and `CAFÉ A` all count as the same name. Only the target folder is checked: the same name in another folder is not changed.
+
+The number can take the asset name past 64 characters. A 64-character name becomes 67 with `(1)`, and that's fine. The scan keeps the name as sent.
+
+`check_asset_name` can't predict this, because it doesn't know what is already in the folder.
+
 ## No name
 
 If `name` is omitted, `null`, or empty, the asset is named `Untitled Import YYYY-MM-DD HH:MM:SS` (UTC), and the scan is named `Upload <jobId>`.

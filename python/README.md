@@ -39,6 +39,8 @@ python -m aptixar_uploader upload /path/to/scene.sog \
   --folder <parent-folder-uuid>
 ```
 
+Without `--folder`, the upload goes to `APTIXAR_PARENT_FOLDER_ID` if that is set (in `.env` or the environment), otherwise to the tenant root.
+
 ## Use as a library
 
 ```python
